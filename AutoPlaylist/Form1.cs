@@ -55,6 +55,8 @@ namespace AutoPlaylist
             string oldAlbum = "Unknown";
             string updated = "N";
 
+            sbPlayList.AppendLine("#EXTM3U"); // add this to the beginning of the first file
+
             foreach (string fileName in Directory.EnumerateFiles(sourceDir, "*.mp3", SearchOption.AllDirectories).OrderBy(filename => filename))
             {
                 title = Path.GetDirectoryName(fileName).Replace(sourceDir,"");
@@ -103,6 +105,7 @@ namespace AutoPlaylist
                         if (updated != "X")
                             SetTagsUpdated(oldArtist, oldAlbum); // this line - should never update id3tags 'X'
                         sbPlayList.Clear();
+                        sbPlayList.AppendLine("#EXTM3U");
                        // track = 1; // reset the track number
                     }
                     //sb.AppendLine(playListTitle.ToUpper());
@@ -122,6 +125,8 @@ namespace AutoPlaylist
                     Log(cbPrefix.Text
                         + title + "/"
                         + Path.GetFileName(fileName).Replace(" ", "%20"));
+
+                    sbPlayList.AppendLine("#EXTINF:-1," + artist + " - " + album + " " + track.ToString());
 
                     sbPlayList.AppendLine(cbPrefix.Text
                         + title + "/"
