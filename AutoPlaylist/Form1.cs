@@ -109,7 +109,7 @@ namespace AutoPlaylist
                        // track = 1; // reset the track number
                     }
                     //sb.AppendLine(playListTitle.ToUpper());
-                    track = 1; // reset the track number    qwjv
+                    track = 1; // reset the track number   
                     Log(playListTitle.ToUpper());
                     playListTitle = playListTitle.Replace(" ", "_");
                     oldPlayListTitle = playListTitle.ToLower();
@@ -126,7 +126,7 @@ namespace AutoPlaylist
                         + title + "/"
                         + Path.GetFileName(fileName).Replace(" ", "%20"));
 
-                    sbPlayList.AppendLine("#EXTINF:-1," + artist + " - " + album + " " + track.ToString());
+                    sbPlayList.AppendLine("#EXTINF:-1," + track.ToString() + " " + album + " - " + artist);
 
                     sbPlayList.AppendLine(cbPrefix.Text
                         + title + "/"
