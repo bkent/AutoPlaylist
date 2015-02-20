@@ -53,7 +53,7 @@ namespace AutoPlaylist
             string album = "Unknown";
             string oldArtist = "Unknown";
             string oldAlbum = "Unknown";
-            string updated = "N";
+            string alreadyTagged = "N";
 
             sbPlayList.AppendLine("#EXTM3U"); // add this to the beginning of the first file
 
@@ -64,75 +64,89 @@ namespace AutoPlaylist
                // if (ct == 10)
                //     break;
 
-                artist = "Unknown";
-                album = "Unknown";
-
-                string[] words = title.Split('\\');
-                if (words.Count() > 2)
+                if ((System.IO.File.GetLastWriteTime(Path.GetDirectoryName(fileName)).Date > dtp.Value.Date)
+                    || (cbUpdateAllPlaylists.Checked))
                 {
-                    playListTitle = words[2]; // the title eg. \author\title
-                    album = words[2];
-                    artist = words[1];
-                }
-                else
-                {
-                    playListTitle = words[1]; // just the authors name - no title subfolders
-                    artist = words[1];
-                }
+                    artist = "Unknown";
+                    album = "Unknown";
 
-                if (cbUpdateAllPlaylists.Checked)
-                    updated = "N";
-                else
-                    updated = CheckMP3Tag(fileName, artist, album, track);
-
-                title = title.Replace(" ","%20");
-                title = title.Replace("\\", "/");
-                if (!ls.Contains(title))
-                {
-                    ls.Add(title);
-                    if (ct > 0) // don't write an empty playlist on the first one
+                    string[] words = title.Split('\\');
+                    if (words.Count() > 2)
                     {
-                        //if (update == "N") // i.e. the title requires an update
-                        if (updated != "Y")
-                        {
-                            //sb.AppendLine("Adding " + oldPlayListTitle + ".m3u");
-                            Log("Adding " + oldPlayListTitle + ".m3u");
-                            StreamWriter playListFile = new StreamWriter(cbDestination.Text + oldPlayListTitle + ".m3u");
-                            playListFile.Write(sbPlayList.ToString());
-                            playListFile.Close();
-                        }
-                        //sb.AppendLine("Contents of sbPlayList are: " + sbPlayList.ToString());
-                        if (updated != "X")
-                            SetTagsUpdated(oldArtist, oldAlbum); // this line - should never update id3tags 'X'
-                        sbPlayList.Clear();
-                        sbPlayList.AppendLine("#EXTM3U");
-                       // track = 1; // reset the track number
+                        playListTitle = words[2]; // the title eg. \author\title
+                        album = words[2];
+                        artist = words[1];
                     }
-                    //sb.AppendLine(playListTitle.ToUpper());
-                    track = 1; // reset the track number   
-                    Log(playListTitle.ToUpper());
-                    playListTitle = playListTitle.Replace(" ", "_");
-                    oldPlayListTitle = playListTitle.ToLower();
-                    oldArtist = artist;
-                    oldAlbum = album;
-                    ct++;
+                    else
+                    {
+                        playListTitle = words[1]; // just the authors name - no title subfolders
+                        artist = words[1];
+                    }
+
+                    if (cbUpdateAllPlaylists.Checked)
+                        alreadyTagged = "N";
+                    else
+                    {
+                        if (System.IO.File.GetCreationTime(fileName).Date > dtp.Value.Date)
+                            alreadyTagged = CheckMP3Tag(fileName, artist, album, track);
+                        else
+                            alreadyTagged = "Y";
+                    }
+
+                    title = title.Replace(" ", "%20");
+                    title = title.Replace("\\", "/");
+                    if (!ls.Contains(title))
+                    {
+                        ls.Add(title);
+                        if (ct > 0) // don't write an empty playlist on the first one
+                        {
+                            //if (update == "N") // i.e. the title requires an update
+                            if (alreadyTagged == "N")
+                            {
+                                //sb.AppendLine("Adding " + oldPlayListTitle + ".m3u");
+                                Log("Adding " + oldPlayListTitle + ".m3u");
+                                StreamWriter playListFile = new StreamWriter(cbDestination.Text + oldPlayListTitle + ".m3u");
+                                playListFile.Write(sbPlayList.ToString());
+                                playListFile.Close();
+                                SetTagsUpdated(oldArtist, oldAlbum);
+                            }
+                            //sb.AppendLine("Contents of sbPlayList are: " + sbPlayList.ToString());
+                            //if (alreadyTagged != "X")
+                            //SetTagsUpdated(oldArtist, oldAlbum); // this line - should never update id3tags 'X'
+                            sbPlayList.Clear();
+                            sbPlayList.AppendLine("#EXTM3U");
+                            // track = 1; // reset the track number
+                        }
+                        //sb.AppendLine(playListTitle.ToUpper());
+                        track = 1; // reset the track number   
+                        Log(playListTitle.ToUpper());
+                        playListTitle = playListTitle.Replace(" ", "_");
+                        oldPlayListTitle = playListTitle.ToLower();
+                        oldArtist = artist;
+                        oldAlbum = album;
+                        ct++;
+                    }
+                    /* sb.AppendLine(cbPrefix.Text
+                         + title + "/"
+                         + Path.GetFileName(fileName).Replace(" ", "%20"));*/
+                    if (alreadyTagged != "Y")
+                    {
+                        Log(cbPrefix.Text
+                            + title + "/"
+                            + Path.GetFileName(fileName).Replace(" ", "%20"));
+
+                        sbPlayList.AppendLine("#EXTINF:-1," + track.ToString() + " " + album + " - " + artist);
+
+                        sbPlayList.AppendLine(cbPrefix.Text
+                            + title + "/"
+                            + Path.GetFileName(fileName).Replace(" ", "%20"));
+
+                        track++;
+                    }
                 }
-               /* sb.AppendLine(cbPrefix.Text
-                    + title + "/"
-                    + Path.GetFileName(fileName).Replace(" ", "%20"));*/
-                if (updated != "Y")
+                else
                 {
-                    Log(cbPrefix.Text
-                        + title + "/"
-                        + Path.GetFileName(fileName).Replace(" ", "%20"));
-
-                    sbPlayList.AppendLine("#EXTINF:-1," + track.ToString() + " " + album + " - " + artist);
-
-                    sbPlayList.AppendLine(cbPrefix.Text
-                        + title + "/"
-                        + Path.GetFileName(fileName).Replace(" ", "%20"));
-
-                    track++;
+                    Log(title);
                 }
             }
             //tb.Text = sb.ToString();
@@ -274,9 +288,17 @@ namespace AutoPlaylist
             Log(author);
         }
 
-        private void Log(string s)
+        private void Log(string s, bool toFile=false)
         {
-            tb.AppendText(s + Environment.NewLine);
+            if (!toFile)
+                tb.AppendText(s + Environment.NewLine);
+            else
+            {
+                StreamWriter playListFile = new StreamWriter(@"C:\Playlist_log.txt");
+                playListFile.WriteLine(s + Environment.NewLine);
+                playListFile.Close();
+
+            }
         }
 
         private void bTitles_Click(object sender, EventArgs e)
@@ -410,21 +432,23 @@ namespace AutoPlaylist
                 // add the new stuff to the db
                 bTitles_Click(this, e);
                 // set the destination and web prefix
-                Log("");
+                /*Log("");
                 Log("**** local playlists ****");
                 Log("");
                 cbPrefix.Text = "http://192.168.1.99/st";
                 cbDestination.Text = "R:\\Story Tapes\\_playlists\\";
                 ProcessDir(cbSource.Text);
                 // set the destination and web prefix
+                 */
                 Log("");
-                Log("**** remote playlists ****");
+                Log("**** Remote playlists ****");
                 Log("");
                 //
                 firstRun = false;
                 cbPrefix.Text = "http://benkent.servehttp.com/st";
                 cbDestination.Text = "R:\\Story Tapes\\_playlistsexternal\\";
                 ProcessDir(cbSource.Text);
+                Log("DONE");
             }
         }
 
@@ -564,6 +588,70 @@ namespace AutoPlaylist
                     oCommand.ExecuteNonQuery();
                 }
             }
+        }
+
+        private void bRunTagging_Click(object sender, EventArgs e)
+        {
+            StringBuilder sb = new StringBuilder();
+            StringBuilder sbPlayList = new StringBuilder();
+            List<string> ls = new List<string>();
+
+            string sourceDir = @"C:\Users\Ben\Music";
+
+            string title = "";
+            string playListTitle = "";
+            string oldPlayListTitle = "";
+            int ct = 0;
+            int track = 1;
+            string artist = "Unknown";
+            string album = "Unknown";
+            string oldArtist = "Unknown";
+            string oldAlbum = "Unknown";
+            string alreadyTagged = "N";
+
+            sbPlayList.AppendLine("#EXTM3U"); // add this to the beginning of the first file
+
+            foreach (string fileName in Directory.EnumerateFiles(sourceDir, "*.mp3", SearchOption.AllDirectories).OrderBy(filename => filename))
+            {
+                title = Path.GetDirectoryName(fileName).Replace(sourceDir, "");
+                
+                artist = "Unknown";
+                album = "Unknown";
+
+                string[] words = title.Split('\\');
+                if (words.Count() > 2)
+                {
+                    playListTitle = words[2]; // the title eg. \author\title
+                    album = words[2];
+                    artist = words[1];
+                }
+                else
+                {
+                    playListTitle = words[1]; // just the authors name - no title subfolders
+                    artist = words[1];
+                }
+
+                if (!ls.Contains(title))
+                {
+                    ls.Add(title);
+                    //sb.AppendLine(playListTitle.ToUpper());
+                    track = 1; // reset the track number   
+                    oldArtist = artist;
+                    oldAlbum = album;
+                    ct++;
+                }
+
+                if (System.IO.File.GetCreationTime(fileName).Date > dtp.Value.Date)
+                    alreadyTagged = CheckMP3Tag(fileName, artist, album, track);
+
+                track++;
+                
+            }
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            dtp.Value = DateTime.Now.AddDays(-2);
         }
     }
 }

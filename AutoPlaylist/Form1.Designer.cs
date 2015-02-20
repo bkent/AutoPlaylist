@@ -45,6 +45,8 @@
             this.bTagTest = new System.Windows.Forms.Button();
             this.cbTags = new System.Windows.Forms.CheckBox();
             this.cbUpdateAllPlaylists = new System.Windows.Forms.CheckBox();
+            this.bRunTagging = new System.Windows.Forms.Button();
+            this.dtp = new System.Windows.Forms.DateTimePicker();
             this.SuspendLayout();
             // 
             // label1
@@ -216,11 +218,30 @@
             this.cbUpdateAllPlaylists.Text = "Update all playlists";
             this.cbUpdateAllPlaylists.UseVisualStyleBackColor = true;
             // 
+            // bRunTagging
+            // 
+            this.bRunTagging.Location = new System.Drawing.Point(652, 328);
+            this.bRunTagging.Name = "bRunTagging";
+            this.bRunTagging.Size = new System.Drawing.Size(75, 23);
+            this.bRunTagging.TabIndex = 16;
+            this.bRunTagging.Text = "Run Tags";
+            this.bRunTagging.UseVisualStyleBackColor = true;
+            this.bRunTagging.Click += new System.EventHandler(this.bRunTagging_Click);
+            // 
+            // dtp
+            // 
+            this.dtp.Location = new System.Drawing.Point(446, 331);
+            this.dtp.Name = "dtp";
+            this.dtp.Size = new System.Drawing.Size(200, 20);
+            this.dtp.TabIndex = 17;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(739, 357);
+            this.Controls.Add(this.dtp);
+            this.Controls.Add(this.bRunTagging);
             this.Controls.Add(this.cbUpdateAllPlaylists);
             this.Controls.Add(this.cbTags);
             this.Controls.Add(this.bTagTest);
@@ -240,6 +261,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
             this.Text = "Playlist Generator";
+            this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -263,6 +285,8 @@
         private System.Windows.Forms.Button bTagTest;
         private System.Windows.Forms.CheckBox cbTags;
         private System.Windows.Forms.CheckBox cbUpdateAllPlaylists;
+        private System.Windows.Forms.Button bRunTagging;
+        private System.Windows.Forms.DateTimePicker dtp;
 
     }
 }
