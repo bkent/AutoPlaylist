@@ -64,6 +64,8 @@ namespace AutoPlaylist
                // if (ct == 10)
                //     break;
 
+
+
                 if ((System.IO.File.GetLastWriteTime(Path.GetDirectoryName(fileName)).Date > dtp.Value.Date)
                     || (cbUpdateAllPlaylists.Checked))
                 {
@@ -412,7 +414,7 @@ namespace AutoPlaylist
             //MessageBox.Show("Need to add " + author);
             string sSQL = "INSERT INTO storytapes(authorid,title,addeddt,seriesorder,filepath,id3tags) VALUES("
                 + authorID.ToString() + ",'" + title + "','" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") 
-                + "',0,'" + title.Replace(" ", "_").ToLower() +"','X')"; 
+                + "',0,'" + title.Replace(" ", "_").ToLower() +"','N')"; 
             using (ODBCClass o = new ODBCClass(DSN))
             {
                 OdbcCommand oCommand = o.GetCommand(sSQL);
@@ -428,7 +430,7 @@ namespace AutoPlaylist
             if (dialogResult == DialogResult.Yes)
             {
                 // set the source dir
-                cbSource.Text = "R:\\Story Tapes";
+                //cbSource.Text = "R:\\Story Tapes";
                 // add the new stuff to the db
                 bTitles_Click(this, e);
                 // set the destination and web prefix
@@ -446,7 +448,7 @@ namespace AutoPlaylist
                 //
                 firstRun = false;
                 cbPrefix.Text = "http://benkent.servehttp.com/st";
-                cbDestination.Text = "R:\\Story Tapes\\_playlistsexternal\\";
+                //cbDestination.Text = "R:\\Story Tapes\\_playlistsexternal\\";
                 ProcessDir(cbSource.Text);
                 Log("DONE");
             }

@@ -64,11 +64,11 @@
             this.cbSource.Items.AddRange(new object[] {
             "R:\\Story Tapes",
             "C:\\Users\\Ben\\Music"});
-            this.cbSource.Location = new System.Drawing.Point(126, 12);
+            this.cbSource.Location = new System.Drawing.Point(107, 12);
             this.cbSource.Name = "cbSource";
             this.cbSource.Size = new System.Drawing.Size(175, 21);
             this.cbSource.TabIndex = 1;
-            this.cbSource.Text = "R:\\Story Tapes";
+            this.cbSource.Text = "C:\\Users\\Ben\\Music";
             // 
             // label2
             // 
@@ -90,7 +90,7 @@
             this.cbDestination.Name = "cbDestination";
             this.cbDestination.Size = new System.Drawing.Size(175, 21);
             this.cbDestination.TabIndex = 3;
-            this.cbDestination.Text = "R:\\Story Tapes\\_playlists\\";
+            this.cbDestination.Text = "C:\\Users\\Ben\\Music\\_playlists\\";
             // 
             // tb
             // 
@@ -103,7 +103,7 @@
             // 
             // bGo
             // 
-            this.bGo.Location = new System.Drawing.Point(574, 10);
+            this.bGo.Location = new System.Drawing.Point(483, 37);
             this.bGo.Name = "bGo";
             this.bGo.Size = new System.Drawing.Size(102, 23);
             this.bGo.TabIndex = 5;
@@ -114,7 +114,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(316, 15);
+            this.label3.Location = new System.Drawing.Point(288, 15);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(61, 13);
             this.label3.TabIndex = 6;
@@ -127,7 +127,7 @@
             "http://192.168.0.99/st",
             "http://benkent.servehttp.com/st",
             "http://listener:mHmrAXlK2GO8clVY@benkent.servehttp.com/st"});
-            this.cbPrefix.Location = new System.Drawing.Point(383, 12);
+            this.cbPrefix.Location = new System.Drawing.Point(355, 10);
             this.cbPrefix.Name = "cbPrefix";
             this.cbPrefix.Size = new System.Drawing.Size(185, 21);
             this.cbPrefix.TabIndex = 7;
@@ -168,9 +168,9 @@
             // 
             // bTitles
             // 
-            this.bTitles.Location = new System.Drawing.Point(574, 39);
+            this.bTitles.Location = new System.Drawing.Point(591, 37);
             this.bTitles.Name = "bTitles";
-            this.bTitles.Size = new System.Drawing.Size(102, 23);
+            this.bTitles.Size = new System.Drawing.Size(85, 23);
             this.bTitles.TabIndex = 11;
             this.bTitles.Text = "Add to DB";
             this.bTitles.UseVisualStyleBackColor = true;
@@ -188,7 +188,7 @@
             // 
             // bTagTest
             // 
-            this.bTagTest.Location = new System.Drawing.Point(427, 39);
+            this.bTagTest.Location = new System.Drawing.Point(402, 37);
             this.bTagTest.Name = "bTagTest";
             this.bTagTest.Size = new System.Drawing.Size(75, 23);
             this.bTagTest.TabIndex = 13;
