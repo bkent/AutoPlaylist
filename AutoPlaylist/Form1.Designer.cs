@@ -47,6 +47,9 @@
             this.cbUpdateAllPlaylists = new System.Windows.Forms.CheckBox();
             this.bRunTagging = new System.Windows.Forms.Button();
             this.dtp = new System.Windows.Forms.DateTimePicker();
+            this.bNewGo = new System.Windows.Forms.Button();
+            this.label4 = new System.Windows.Forms.Label();
+            this.cbIgnoreDateUseTags = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // label1
@@ -64,7 +67,7 @@
             this.cbSource.Items.AddRange(new object[] {
             "R:\\Story Tapes",
             "C:\\Users\\Ben\\Music"});
-            this.cbSource.Location = new System.Drawing.Point(107, 12);
+            this.cbSource.Location = new System.Drawing.Point(126, 12);
             this.cbSource.Name = "cbSource";
             this.cbSource.Size = new System.Drawing.Size(175, 21);
             this.cbSource.TabIndex = 1;
@@ -85,12 +88,13 @@
             this.cbDestination.Items.AddRange(new object[] {
             "R:\\Story Tapes\\_playlists\\",
             "R:\\Story Tapes\\_playlistsexternal\\",
-            "C:\\Users\\Ben\\Music\\_playlists\\"});
+            "C:\\Users\\Ben\\Music\\_playlists\\",
+            "C:\\Users\\Ben\\Music\\_playlistsexternal\\"});
             this.cbDestination.Location = new System.Drawing.Point(126, 39);
             this.cbDestination.Name = "cbDestination";
             this.cbDestination.Size = new System.Drawing.Size(175, 21);
             this.cbDestination.TabIndex = 3;
-            this.cbDestination.Text = "C:\\Users\\Ben\\Music\\_playlists\\";
+            this.cbDestination.Text = "C:\\Users\\Ben\\Music\\_playlistsexternal\\";
             // 
             // tb
             // 
@@ -109,12 +113,13 @@
             this.bGo.TabIndex = 5;
             this.bGo.Text = "Create Playlists";
             this.bGo.UseVisualStyleBackColor = true;
+            this.bGo.Visible = false;
             this.bGo.Click += new System.EventHandler(this.bGo_Click);
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(288, 15);
+            this.label3.Location = new System.Drawing.Point(315, 15);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(61, 13);
             this.label3.TabIndex = 6;
@@ -127,7 +132,7 @@
             "http://192.168.0.99/st",
             "http://benkent.servehttp.com/st",
             "http://listener:mHmrAXlK2GO8clVY@benkent.servehttp.com/st"});
-            this.cbPrefix.Location = new System.Drawing.Point(355, 10);
+            this.cbPrefix.Location = new System.Drawing.Point(382, 10);
             this.cbPrefix.Name = "cbPrefix";
             this.cbPrefix.Size = new System.Drawing.Size(185, 21);
             this.cbPrefix.TabIndex = 7;
@@ -174,16 +179,18 @@
             this.bTitles.TabIndex = 11;
             this.bTitles.Text = "Add to DB";
             this.bTitles.UseVisualStyleBackColor = true;
+            this.bTitles.Visible = false;
             this.bTitles.Click += new System.EventHandler(this.bTitles_Click);
             // 
             // bQuickGo
             // 
-            this.bQuickGo.Location = new System.Drawing.Point(682, 10);
+            this.bQuickGo.Location = new System.Drawing.Point(568, 5);
             this.bQuickGo.Name = "bQuickGo";
-            this.bQuickGo.Size = new System.Drawing.Size(56, 52);
+            this.bQuickGo.Size = new System.Drawing.Size(56, 23);
             this.bQuickGo.TabIndex = 12;
             this.bQuickGo.Text = "Quick Go";
             this.bQuickGo.UseVisualStyleBackColor = true;
+            this.bQuickGo.Visible = false;
             this.bQuickGo.Click += new System.EventHandler(this.bQuickGo_Click);
             // 
             // bTagTest
@@ -194,6 +201,7 @@
             this.bTagTest.TabIndex = 13;
             this.bTagTest.Text = "Tag Test";
             this.bTagTest.UseVisualStyleBackColor = true;
+            this.bTagTest.Visible = false;
             this.bTagTest.Click += new System.EventHandler(this.bTagTest_Click);
             // 
             // cbTags
@@ -201,45 +209,80 @@
             this.cbTags.AutoSize = true;
             this.cbTags.Checked = true;
             this.cbTags.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbTags.Location = new System.Drawing.Point(12, 328);
+            this.cbTags.Location = new System.Drawing.Point(126, 331);
             this.cbTags.Name = "cbTags";
             this.cbTags.Size = new System.Drawing.Size(104, 17);
             this.cbTags.TabIndex = 14;
             this.cbTags.Text = "Update ID3 tags";
             this.cbTags.UseVisualStyleBackColor = true;
+            this.cbTags.Visible = false;
             // 
             // cbUpdateAllPlaylists
             // 
             this.cbUpdateAllPlaylists.AutoSize = true;
-            this.cbUpdateAllPlaylists.Location = new System.Drawing.Point(122, 328);
+            this.cbUpdateAllPlaylists.Location = new System.Drawing.Point(15, 331);
             this.cbUpdateAllPlaylists.Name = "cbUpdateAllPlaylists";
             this.cbUpdateAllPlaylists.Size = new System.Drawing.Size(113, 17);
             this.cbUpdateAllPlaylists.TabIndex = 15;
             this.cbUpdateAllPlaylists.Text = "Update all playlists";
             this.cbUpdateAllPlaylists.UseVisualStyleBackColor = true;
+            this.cbUpdateAllPlaylists.Visible = false;
             // 
             // bRunTagging
             // 
-            this.bRunTagging.Location = new System.Drawing.Point(652, 328);
+            this.bRunTagging.Location = new System.Drawing.Point(258, 324);
             this.bRunTagging.Name = "bRunTagging";
             this.bRunTagging.Size = new System.Drawing.Size(75, 23);
             this.bRunTagging.TabIndex = 16;
             this.bRunTagging.Text = "Run Tags";
             this.bRunTagging.UseVisualStyleBackColor = true;
+            this.bRunTagging.Visible = false;
             this.bRunTagging.Click += new System.EventHandler(this.bRunTagging_Click);
             // 
             // dtp
             // 
-            this.dtp.Location = new System.Drawing.Point(446, 331);
+            this.dtp.Location = new System.Drawing.Point(591, 328);
             this.dtp.Name = "dtp";
-            this.dtp.Size = new System.Drawing.Size(200, 20);
+            this.dtp.Size = new System.Drawing.Size(136, 20);
             this.dtp.TabIndex = 17;
+            // 
+            // bNewGo
+            // 
+            this.bNewGo.Location = new System.Drawing.Point(672, 5);
+            this.bNewGo.Name = "bNewGo";
+            this.bNewGo.Size = new System.Drawing.Size(55, 50);
+            this.bNewGo.TabIndex = 18;
+            this.bNewGo.Text = "Go";
+            this.bNewGo.UseVisualStyleBackColor = true;
+            this.bNewGo.Click += new System.EventHandler(this.bNewGo_Click);
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(332, 331);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(253, 13);
+            this.label4.TabIndex = 19;
+            this.label4.Text = "Process title (tags and playlist) if any files older than: ";
+            // 
+            // cbIgnoreDateUseTags
+            // 
+            this.cbIgnoreDateUseTags.AutoSize = true;
+            this.cbIgnoreDateUseTags.Location = new System.Drawing.Point(559, 352);
+            this.cbIgnoreDateUseTags.Name = "cbIgnoreDateUseTags";
+            this.cbIgnoreDateUseTags.Size = new System.Drawing.Size(168, 17);
+            this.cbIgnoreDateUseTags.TabIndex = 20;
+            this.cbIgnoreDateUseTags.Text = "Ignore dates - go by untagged";
+            this.cbIgnoreDateUseTags.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(739, 357);
+            this.ClientSize = new System.Drawing.Size(739, 373);
+            this.Controls.Add(this.cbIgnoreDateUseTags);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.bNewGo);
             this.Controls.Add(this.dtp);
             this.Controls.Add(this.bRunTagging);
             this.Controls.Add(this.cbUpdateAllPlaylists);
@@ -287,6 +330,9 @@
         private System.Windows.Forms.CheckBox cbUpdateAllPlaylists;
         private System.Windows.Forms.Button bRunTagging;
         private System.Windows.Forms.DateTimePicker dtp;
+        private System.Windows.Forms.Button bNewGo;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.CheckBox cbIgnoreDateUseTags;
 
     }
 }

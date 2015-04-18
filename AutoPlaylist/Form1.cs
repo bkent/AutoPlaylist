@@ -65,8 +65,8 @@ namespace AutoPlaylist
                //     break;
 
 
-
-                if ((System.IO.File.GetLastWriteTime(Path.GetDirectoryName(fileName)).Date > dtp.Value.Date)
+                //if ((System.IO.File.GetLastWriteTime(Path.GetDirectoryName(fileName)).Date > dtp.Value.Date)
+                if ((System.IO.File.GetLastWriteTime(fileName).Date > dtp.Value.Date)
                     || (cbUpdateAllPlaylists.Checked))
                 {
                     artist = "Unknown";
@@ -86,11 +86,18 @@ namespace AutoPlaylist
                     }
 
                     if (cbUpdateAllPlaylists.Checked)
+                    //if (true) // always do this
                         alreadyTagged = "N";
                     else
                     {
+                       // if (System.IO.File.GetCreationTime(fileName).Date > dtp.Value.Date)
+                        Log("Checking age of " + fileName);
+                        Log(System.IO.File.GetCreationTime(fileName).Date.ToString());
                         if (System.IO.File.GetCreationTime(fileName).Date > dtp.Value.Date)
+                        {
+                            Log("Running alreadytadded method");
                             alreadyTagged = CheckMP3Tag(fileName, artist, album, track);
+                        }
                         else
                             alreadyTagged = "Y";
                     }
@@ -148,7 +155,7 @@ namespace AutoPlaylist
                 }
                 else
                 {
-                    Log(title);
+                    Log(title + " last updated: " + System.IO.File.GetLastWriteTime(fileName).Date.ToString());
                 }
             }
             //tb.Text = sb.ToString();
@@ -523,7 +530,7 @@ namespace AutoPlaylist
 
         private string CheckMP3Tag(string fileName, string author, string album, int track)
         {
-            // sanitise album string - pesky george's marvellous medcine!!
+           /* // sanitise album string - pesky george's marvellous medcine!!
             album = album.Replace("'", "''");
             // check the value of id3tag for the author/album
             DataTable dt = new DataTable();
@@ -545,35 +552,35 @@ namespace AutoPlaylist
                         return row["id3tags"].ToString(); // Y or X - don't bother
                     }
                 }
-            }
+            } */
 
             if (cbTags.Checked)
             {
                 TagLib.File tagFile = TagLib.File.Create(fileName);
-                /*if (tagFile.Tag.Album != null)
+                if (tagFile.Tag.Album != null)
                 {
                     Log(fileName + " already has tags." + " Author: " + author + " Album: " + album + " Track: " + track.ToString());
                     // update id3tag field
                     //SetTagsUpdated(author, album);
                 }
                 else
-                {*/
-                Log(fileName + " TAGS REQUIRED" + " Author: " + author + " Album: " + album + " Track: " + track.ToString());
+                {
+                    Log(fileName + " TAGS REQUIRED" + " Author: " + author + " Album: " + album + " Track: " + track.ToString());
 
-                List<string> sl = new List<string>();
-                sl.Add(author);
+                    List<string> sl = new List<string>();
+                    sl.Add(author);
 
-                tagFile.Tag.AlbumArtists = sl.ToArray();
-                tagFile.Tag.Artists = sl.ToArray();
-                tagFile.Tag.Track = (uint)track;
-                tagFile.Tag.Album = album;
+                    tagFile.Tag.AlbumArtists = sl.ToArray();
+                    tagFile.Tag.Artists = sl.ToArray();
+                    tagFile.Tag.Track = (uint)track;
+                    tagFile.Tag.Album = album;
 
-                tagFile.Save();
+                    tagFile.Save();
+                }
+                return "N";
             }
-            return "N";
-
-                //}
-            
+            else
+                return "Y"; // update tags is not checked, so return 'already tagged'
         }
 
         private void SetTagsUpdated(string author, string album)
@@ -589,6 +596,20 @@ namespace AutoPlaylist
                         + " AND authorid=(SELECT id FROM `authors` WHERE author='" + author + "')");
                     oCommand.ExecuteNonQuery();
                 }
+            }
+        }
+
+        private bool NewCheckMP3Tag(string filePath)
+        {
+            TagLib.File tagFile = TagLib.File.Create(filePath);
+            if (tagFile.Tag.Album != null)
+            {
+                return false;
+            }
+            else
+            {
+                Log(filePath + " NO AUTHOR TAG");
+                return true;                   
             }
         }
 
@@ -654,6 +675,138 @@ namespace AutoPlaylist
         private void Form1_Load(object sender, EventArgs e)
         {
             dtp.Value = DateTime.Now.AddDays(-2);
+        }
+
+        private List<string> CheckAllFoldersForNewMP3Files(string sourceDir)
+        {
+            List<string> dirsForUpdate = new List<string>();
+
+            foreach (string fileName in Directory.EnumerateFiles(sourceDir, "*.mp3", SearchOption.AllDirectories).OrderBy(filename => filename))
+            {
+                //Log("Checking age of " + fileName);
+                //Log(System.IO.File.GetCreationTime(fileName).Date.ToString());
+                if (!cbIgnoreDateUseTags.Checked)
+                {
+                    if (System.IO.File.GetCreationTime(fileName).Date > dtp.Value.Date)
+                    {
+                        if (!dirsForUpdate.Contains(Path.GetDirectoryName(fileName)))
+                        {
+                            dirsForUpdate.Add(Path.GetDirectoryName(fileName));
+                            Log("Adding " + Path.GetDirectoryName(fileName) + " (age:" + System.IO.File.GetCreationTime(fileName).Date.ToString() + ")");
+                        }
+                    }
+                    //else
+                    // Log("File too old");
+                }
+                else
+                {
+                    if (NewCheckMP3Tag(fileName))
+                    {
+                        if (!dirsForUpdate.Contains(Path.GetDirectoryName(fileName)))
+                        {
+                            dirsForUpdate.Add(Path.GetDirectoryName(fileName));
+                            Log("Adding " + Path.GetDirectoryName(fileName) + " (it contains an untagged file)");
+                        }
+                    }
+                }
+            }
+            return dirsForUpdate;
+        }
+
+        public void ProcessUpdates(List<string> dirsForUpdate, string sourceDir)
+        {
+            StringBuilder sb = new StringBuilder();
+            StringBuilder sbPlayList = new StringBuilder();
+            List<string> ls = new List<string>();
+
+            string title = "";
+            string playListTitle = "";
+            int track = 1;
+            string artist = "Unknown";
+            string album = "Unknown";
+            string alreadyTagged = "N";
+
+             // add this to the beginning of the first file
+
+            foreach (string dir in dirsForUpdate)
+	        {
+                sbPlayList.Clear();
+                sbPlayList.AppendLine("#EXTM3U");
+                track = 1;
+                foreach (string fileName in Directory.EnumerateFiles(dir, "*.mp3", SearchOption.AllDirectories).OrderBy(filename => filename))
+                {
+                    if (track == 1) // only do this first pass
+                    {
+                        Log(fileName);
+                        Log(Path.GetDirectoryName(fileName));
+                        title = Path.GetDirectoryName(fileName).Replace(sourceDir, "");
+
+                        string[] words = title.Split('\\');
+                        if (words.Count() > 2)
+                        {
+                            playListTitle = words[2]; // the title eg. \author\title
+                            album = words[2];
+                            artist = words[1];
+                        }
+                        else
+                        {
+                            playListTitle = words[1]; // just the authors name - no title subfolders
+                            artist = words[1];
+                        }
+
+                        playListTitle = playListTitle.Replace(" ", "_");
+                        playListTitle = playListTitle.ToLower();
+                    }
+
+                    SetMP3Tag(fileName, artist, album, track);
+
+                    Log(cbPrefix.Text
+                            + title + "/"
+                            + Path.GetFileName(fileName).Replace(" ", "%20"));
+
+                    sbPlayList.AppendLine("#EXTINF:-1," + track.ToString() + " " + album + " - " + artist);
+
+                    title = title.Replace(" ", "%20");
+                    title = title.Replace("\\", "/");
+
+                    sbPlayList.AppendLine(cbPrefix.Text
+                        + title + "/"
+                        + Path.GetFileName(fileName).Replace(" ", "%20"));
+
+                    track++;
+                }
+
+                Log("Adding " + playListTitle + ".m3u");
+                StreamWriter playListFile = new StreamWriter(cbDestination.Text + playListTitle + ".m3u");
+                playListFile.Write(sbPlayList.ToString());
+                playListFile.Close();
+	        } 
+        }
+
+        private void SetMP3Tag(string fileName, string author, string album, int track)
+        {
+            TagLib.File tagFile = TagLib.File.Create(fileName);
+                
+            Log(fileName + " TAGS REQUIRED" + " Author: " + author + " Album: " + album + " Track: " + track.ToString());
+
+            List<string> sl = new List<string>();
+            sl.Add(author);
+
+            tagFile.Tag.AlbumArtists = sl.ToArray();
+            tagFile.Tag.Artists = sl.ToArray();
+            tagFile.Tag.Track = (uint)track;
+            tagFile.Tag.Album = album;
+
+            tagFile.Save();
+        }
+
+        private void bNewGo_Click(object sender, EventArgs e)
+        {
+            bTitles_Click(this, e);
+            List<string> sl = CheckAllFoldersForNewMP3Files(cbSource.Text);
+            ProcessUpdates(sl, cbSource.Text);
+            Log("");
+            Log("DONE");
         }
     }
 }
